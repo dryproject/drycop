@@ -30,8 +30,13 @@ var CheckCmd = &cobra.Command{
 		}
 
 		// Process the input arguments:
+		ok := true
 		for _, arg := range args {
-			checkProject(arg)
+			ok = checkProject(arg) && ok
+		}
+
+		if !ok {
+			os.Exit(1) // TODO: use EX_* exit codes
 		}
 	},
 }
@@ -72,20 +77,23 @@ func checkFileExists(logger *log.Entry, dir string, file string) bool {
 	logger = logger.WithField("file", file)
 	logger.Trace("Checking for file")
 
-	exists := _checkFileExists(dir, file)
-	if !exists {
+	ok := _checkFileExists(dir, file)
+	if !ok {
 		logger.Warnf("Missing file: %s", file)
 	}
-	return exists
+	return ok
 }
 
-func checkProject(dir string) {
+func checkProject(dir string) bool {
 	logger := log.WithField("project", dir)
 	logger.Info("Checking project")
 
-	checkFileExists(logger, dir, ".gitignore")
-	checkFileExists(logger, dir, "AUTHORS")
-	checkFileExists(logger, dir, "Makefile")
-	checkFileExists(logger, dir, "UNLICENSE")
-	checkFileExists(logger, dir, "VERSION")
+	ok := true
+	ok = checkFileExists(logger, dir, ".gitignore") && ok
+	ok = checkFileExists(logger, dir, "AUTHORS") && ok
+	ok = checkFileExists(logger, dir, "Makefile") && ok
+	ok = checkFileExists(logger, dir, "UNLICENSE") && ok
+	ok = checkFileExists(logger, dir, "VERSION") && ok
+
+	return ok
 }
