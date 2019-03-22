@@ -1,0 +1,16 @@
+# See: https://docs.travis-ci.com/user/languages/go/
+language: go
+go:
+  - 1.12
+git:
+  depth: 1
+cache:
+  directories:
+    - $HOME/.cache/go-build
+    - $HOME/gopath/pkg/mod
+install:
+  - go get -u github.com/dryproject/drycop/drycop
+  - go get -t -v ./...
+script:
+  - drycop check -v
+  - go test -v ./...
