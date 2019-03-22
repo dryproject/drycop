@@ -3,7 +3,6 @@
 package cmd
 
 import (
-	"fmt"
 	"os"
 
 	log "github.com/Sirupsen/logrus"
@@ -13,8 +12,8 @@ import (
 // CheckCmd describes and implements the `drycop check` command
 var CheckCmd = &cobra.Command{
 	Use:   "check [dir...]",
-	Short: "Check project structure",
-	Long:  "Check project structure",
+	Short: "Check project conformance",
+	Long:  "Check project conformance",
 	Args: func(cmd *cobra.Command, args []string) error {
 		// Validate all input arguments:
 		for _, arg := range args {
@@ -45,39 +44,11 @@ func init() {
 	RootCmd.AddCommand(CheckCmd)
 }
 
-func validateInputDirectory(arg string) (int, error) {
-	info, err := os.Stat(arg)
-	if err != nil {
-		if os.IsNotExist(err) {
-			return 66, fmt.Errorf("%s does not exist", arg) // EX_NOINPUT
-		}
-		panic(err)
-	}
-	if !info.IsDir() {
-		return 66, fmt.Errorf("%s is not a directory", arg) // EX_NOINPUT
-	}
-	return 0, nil
-}
-
-func _checkFileExists(dir string, file string) bool {
-	info, err := os.Stat(fmt.Sprintf("%s/%s", dir, file))
-	if err != nil {
-		if os.IsNotExist(err) {
-			return false
-		}
-		panic(err)
-	}
-	if info.IsDir() {
-		return false
-	}
-	return true
-}
-
 func checkFileExists(logger *log.Entry, dir string, file string) bool {
 	logger = logger.WithField("file", file)
 	logger.Trace("Checking for file")
 
-	ok := _checkFileExists(dir, file)
+	ok := fileExists(dir, file)
 	if !ok {
 		logger.Warnf("Missing file: %s", file)
 	}
