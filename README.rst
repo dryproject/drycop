@@ -45,3 +45,23 @@ Installation
 ::
 
    $ go get -u github.com/dryproject/drycop/drycop
+
+Usage
+=====
+
+Usage on Travis CI
+------------------
+
+::
+
+   $ cat .travis.yml
+   # See: https://drycop.org
+   language: go
+   go:
+     - 1.12
+   git:
+     depth: 1
+   install:
+     - go get -u github.com/dryproject/drycop/drycop
+   script:
+     - drycop check -v
