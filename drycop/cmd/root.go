@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 
+	log "github.com/Sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -16,9 +17,9 @@ var verbose bool
 
 // RootCmd describes the `drycop` command
 var RootCmd = &cobra.Command{
-	Use:   "drycop",
-	Short: "DRYcop",
-	Long: `DRYcop is a lint tool for DRY projects.`,
+	Use:     "drycop",
+	Short:   "DRYcop",
+	Long:    `DRYcop is a lint tool for DRY projects.`,
 	Version: "0.0.0",
 }
 
@@ -58,5 +59,16 @@ func initConfig() {
 		if debug {
 			fmt.Println("Using config file:", viper.ConfigFileUsed())
 		}
+	}
+
+	// Configure output logging:
+	log.SetOutput(os.Stderr)
+	log.SetFormatter(&log.TextFormatter{})
+	if debug {
+		log.SetLevel(log.TraceLevel)
+	} else if verbose {
+		log.SetLevel(log.InfoLevel)
+	} else {
+		log.SetLevel(log.WarnLevel)
 	}
 }
