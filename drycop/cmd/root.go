@@ -12,6 +12,7 @@ import (
 )
 
 var configFile string
+var outputFormat string
 var debug bool
 var verbose bool
 
@@ -35,6 +36,7 @@ func init() {
 	cobra.OnInitialize(initConfig)
 	RootCmd.PersistentFlags().StringVarP(&configFile, "config", "C", "", "Set config file (default: $HOME/.drycop/config.yaml)")
 	RootCmd.PersistentFlags().BoolVarP(&debug, "debug", "d", false, "Enable debugging")
+	RootCmd.PersistentFlags().StringVarP(&outputFormat, "output", "o", "", "Set output format to 'text' or 'json' (default: text)")
 	RootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Be verbose")
 	RootCmd.SetVersionTemplate(`DRYcop {{printf "%s" .Version}}
 `)
@@ -61,9 +63,15 @@ func initConfig() {
 		}
 	}
 
-	// Configure output logging:
+	// Configure the logger output format:
 	log.SetOutput(os.Stderr)
-	log.SetFormatter(&log.TextFormatter{})
+	if outputFormat == "json" {
+		log.SetFormatter(&log.JSONFormatter{})
+	} else {
+		log.SetFormatter(&log.TextFormatter{})
+	}
+
+	// Configure the logger level:
 	if debug {
 		log.SetLevel(log.TraceLevel)
 	} else if verbose {
