@@ -40,15 +40,16 @@ func init() {
 	RootCmd.AddCommand(DetectCmd)
 }
 
-func detectProject(dir string) {
-	logger := log.WithField("project", dir)
+func detectProject(projectDir string) {
+	logger := log.WithField("project", projectDir)
 	logger.Info("Detecting project")
 
-	language := detectProjectLanguage(dir)
-	builder := detectProjectBuilder(dir, language)
-	framework := detectProjectFramework(dir, language)
+	builder := detectProjectBuilder(projectDir)
+	language := detectProjectLanguage(projectDir, builder)
+	framework := detectProjectFramework(projectDir, builder, language)
 
-	fmt.Printf("%s\tlanguage=%s\tbuilder=%s\tframework=%s\n", dir,
+	fmt.Printf("%s\tlanguage=%s\tbuilder=%s\tframework=%s\n",
+		projectDir,
 		strings.ToLower(language.String()),
 		strings.ToLower(builder.String()),
 		strings.ToLower(framework.String()))

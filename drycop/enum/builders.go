@@ -14,6 +14,8 @@ const (
 	ElixirHex
 	GoBuild
 	Gradle
+	Make
+	Maven
 	OCamlDune
 	PythonPIP
 	RubyGems
@@ -34,6 +36,10 @@ func (builder Builder) String() string {
 		return "Go"
 	case Gradle:
 		return "Gradle"
+	case Make:
+		return "Make"
+	case Maven:
+		return "Maven"
 	case OCamlDune:
 		return "Dune"
 	case PythonPIP:
