@@ -23,6 +23,7 @@ const (
 	Julia
 	Kotlin
 	Lua
+	Markdown
 	ObjectiveC
 	OCaml
 	PHP
@@ -68,6 +69,8 @@ func (language Language) String() string {
 		return "Kotlin"
 	case Lua:
 		return "Lua"
+	case Markdown:
+		return "Markdown"
 	case ObjectiveC:
 		return "Objective-C"
 	case OCaml:

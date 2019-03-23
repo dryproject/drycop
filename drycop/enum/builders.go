@@ -8,7 +8,8 @@ type Builder int
 // The list of supported build systems
 const (
 	UnknownBuilder Builder = iota
-	Autotools
+	Autoconf
+	Automake
 	CMake
 	DartPub
 	ElixirHex
@@ -24,8 +25,10 @@ const (
 
 func (builder Builder) String() string {
 	switch builder {
-	case Autotools:
-		return "Autotools"
+	case Autoconf:
+		return "Autoconf"
+	case Automake:
+		return "Automake"
 	case CMake:
 		return "CMake"
 	case DartPub:
@@ -39,13 +42,13 @@ func (builder Builder) String() string {
 	case Make:
 		return "Make"
 	case Maven:
-		return "Maven"
+		return "MVN"
 	case OCamlDune:
 		return "Dune"
 	case PythonPIP:
 		return "PIP"
 	case RubyGems:
-		return "RubyGems"
+		return "Gem"
 	case SwiftPackageManager:
 		return "SPM"
 	case UnknownBuilder:
