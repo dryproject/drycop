@@ -52,8 +52,6 @@ func (builder Builder) String() string {
 	case SwiftPackageManager:
 		return "SPM"
 	case UnknownBuilder:
-	default:
-		break
 	}
 	return "Unknown"
 }

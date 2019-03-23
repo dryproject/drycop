@@ -94,8 +94,6 @@ func (language Language) String() string {
 	case Zig:
 		return "Zig"
 	case UnknownLanguage:
-	default:
-		break
 	}
 	return "Unknown"
 }

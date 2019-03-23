@@ -6,6 +6,7 @@ import (
 	"os"
 
 	log "github.com/Sirupsen/logrus"
+	"github.com/dryproject/drycop/drycop/enum"
 	"github.com/spf13/cobra"
 )
 
@@ -55,16 +56,93 @@ func checkFileExists(logger *log.Entry, dir string, file string) bool {
 	return ok
 }
 
-func checkProject(dir string) bool {
-	logger := log.WithField("project", dir)
+func checkDirExists(logger *log.Entry, dir string, subdir string) bool {
+	logger = logger.WithField("dir", subdir)
+	logger.Trace("Checking for directory")
+
+	ok := dirExists(dir, subdir)
+	if !ok {
+		logger.Warnf("Missing directory: %s", subdir)
+	}
+	return ok
+}
+
+func checkProject(projectDir string) bool {
+	logger := log.WithField("project", projectDir)
 	logger.Info("Checking project")
 
+	builder := detectProjectBuilder(projectDir)
+	language := detectProjectLanguage(projectDir, builder)
+	framework := detectProjectFramework(projectDir, builder, language)
+	markup := detectProjectMarkup(projectDir, language)
+	logger.WithFields(log.Fields{
+		"builder":   builder,
+		"language":  language,
+		"framework": framework,
+		"markup":    markup,
+	}).Info("Detected project")
+
 	ok := true
-	ok = checkFileExists(logger, dir, ".gitignore") && ok
-	ok = checkFileExists(logger, dir, "AUTHORS") && ok
-	ok = checkFileExists(logger, dir, "Makefile") && ok
-	ok = checkFileExists(logger, dir, "UNLICENSE") && ok
-	ok = checkFileExists(logger, dir, "VERSION") && ok
+
+	ok = checkDirExists(logger, projectDir, ".git") && ok
+	ok = checkFileExists(logger, projectDir, ".gitignore") && ok
+	// TODO: .travis.yml?
+	ok = checkFileExists(logger, projectDir, "AUTHORS") && ok
+	switch markup {
+	case "rst": // reStructuredText
+		ok = checkFileExists(logger, projectDir, "CHANGES.rst") && ok
+	case "md": // Markdown
+		switch builder {
+		case enum.DartPub:
+			ok = checkFileExists(logger, projectDir, "CHANGELOG.md") && ok
+		default:
+			ok = checkFileExists(logger, projectDir, "CHANGES.md") && ok
+		}
+	}
+	ok = checkFileExists(logger, projectDir, "CREDITS."+markup) && ok
+	ok = checkFileExists(logger, projectDir, "Makefile") && ok
+	// TODO: README symlink?
+	ok = checkFileExists(logger, projectDir, "README."+markup) && ok
+	ok = checkFileExists(logger, projectDir, "TODO."+markup) && ok
+	ok = checkFileExists(logger, projectDir, "UNLICENSE") && ok
+	ok = checkFileExists(logger, projectDir, "VERSION") && ok
+
+	switch language {
+	case enum.C:
+	case enum.Csharp:
+	case enum.Cxx:
+	case enum.CommonLisp:
+	case enum.D:
+	case enum.Dart:
+	case enum.DRY:
+	case enum.Elixir:
+	case enum.Erlang:
+	case enum.Go:
+	case enum.Java:
+	case enum.JavaScript:
+	case enum.Julia:
+	case enum.Kotlin:
+	case enum.Lua:
+	case enum.Markdown:
+	case enum.ObjectiveC:
+	case enum.OCaml:
+	case enum.PHP:
+	case enum.Python:
+	case enum.RestructuredText:
+	case enum.Ruby:
+	case enum.Rust:
+	case enum.Swift:
+	case enum.TypeScript:
+	case enum.YAML:
+	case enum.Zig:
+	case enum.UnknownLanguage:
+	default:
+	}
+
+	// TODO: check .github/
+	// TODO: check author of last commit
+	// TODO: check file checksums
+	// TODO: check change log
 
 	return ok
 }

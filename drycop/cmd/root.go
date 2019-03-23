@@ -65,18 +65,20 @@ func initConfig() {
 
 	// Configure the logger output format:
 	log.SetOutput(os.Stderr)
-	if outputFormat == "json" {
+	switch outputFormat {
+	case "json":
 		log.SetFormatter(&log.JSONFormatter{})
-	} else {
+	default:
 		log.SetFormatter(&log.TextFormatter{})
 	}
 
 	// Configure the logger level:
-	if debug {
+	switch {
+	case debug:
 		log.SetLevel(log.TraceLevel)
-	} else if verbose {
+	case verbose:
 		log.SetLevel(log.InfoLevel)
-	} else {
+	default:
 		log.SetLevel(log.WarnLevel)
 	}
 }

@@ -22,8 +22,6 @@ func (framework Framework) String() string {
 	case Flutter:
 		return "Flutter"
 	case UnknownFramework:
-	default:
-		break
 	}
 	return "Unknown"
 }

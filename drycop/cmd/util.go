@@ -142,3 +142,41 @@ func detectProjectFramework(projectDir string, builder enum.Builder, language en
 	}
 	return enum.UnknownFramework
 }
+
+func detectProjectMarkup(projectDir string, language enum.Language) string {
+	switch language {
+	case enum.C:
+	case enum.Csharp:
+	case enum.Cxx:
+	case enum.CommonLisp:
+	case enum.D:
+	case enum.Dart:
+		return "md"
+	case enum.DRY:
+	case enum.Elixir:
+		return "md"
+	case enum.Erlang:
+	case enum.Go:
+	case enum.Java:
+	case enum.JavaScript:
+	case enum.Julia:
+	case enum.Kotlin:
+	case enum.Lua:
+	case enum.Markdown:
+	case enum.ObjectiveC:
+	case enum.OCaml:
+	case enum.PHP:
+	case enum.Python:
+	case enum.RestructuredText:
+	case enum.Ruby:
+		return "md"
+	case enum.Rust:
+	case enum.Swift:
+	case enum.TypeScript:
+	case enum.YAML:
+	case enum.Zig:
+	case enum.UnknownLanguage:
+	default:
+	}
+	return "rst"
+}
