@@ -4,6 +4,7 @@ package cmd
 
 import (
 	"fmt"
+	"go/build"
 	"os"
 
 	log "github.com/Sirupsen/logrus"
@@ -52,6 +53,7 @@ func initConfig() {
 		viper.SetConfigName("config")
 		viper.AddConfigPath(".")
 		viper.AddConfigPath("$HOME/.drycop")
+		viper.AddConfigPath(fmt.Sprintf("%s/src/%s", build.Default.GOPATH, "github.com/dryproject/drycop"))
 	}
 
 	viper.AutomaticEnv() // read in environment variables that match
@@ -65,6 +67,9 @@ func initConfig() {
 
 	// Configure the logger output format:
 	log.SetOutput(os.Stderr)
+	if outputFormat == "" {
+		outputFormat = viper.GetString("output")
+	}
 	switch outputFormat {
 	case "json":
 		log.SetFormatter(&log.JSONFormatter{})
