@@ -12,5 +12,5 @@ install:
   - go get -u github.com/dryproject/drycop/drycop
   - go get -t -v ./...
 script:
-  - drycop check -v
+  - drycop check -d
   - go test -v ./...
