@@ -51,6 +51,7 @@ func initConfig() {
 	} else {
 		// Search for config file in the current directory and under the home directory:
 		viper.SetConfigName("config")
+		viper.SetConfigType("yaml")
 		viper.AddConfigPath(".")
 		viper.AddConfigPath("$HOME/.drycop")
 		viper.AddConfigPath(fmt.Sprintf("%s/src/%s", build.Default.GOPATH, "github.com/dryproject/drycop"))

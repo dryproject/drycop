@@ -8,7 +8,19 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/dryproject/drycop/drycop/enum"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
+
+type File struct {
+	File    string `mapstructure:"file"`
+	Markup  string `mapstructure:"markup"`
+	Builder string `mapstructure:"builder"`
+}
+
+type Config struct {
+	Dirs  []string `mapstructure:"dirs"`
+	Files []File   `mapstructure:"files"`
+}
 
 // CheckCmd describes and implements the `drycop check` command
 var CheckCmd = &cobra.Command{
@@ -84,28 +96,30 @@ func checkProject(projectDir string) bool {
 
 	ok := true
 
-	ok = checkDirExists(logger, projectDir, ".git") && ok
-	ok = checkFileExists(logger, projectDir, ".gitignore") && ok
-	// TODO: .travis.yml?
-	ok = checkFileExists(logger, projectDir, "AUTHORS") && ok
-	switch markup {
-	case "rst": // reStructuredText
-		ok = checkFileExists(logger, projectDir, "CHANGES.rst") && ok
-	case "md": // Markdown
-		switch builder {
-		case enum.DartPub:
-			ok = checkFileExists(logger, projectDir, "CHANGELOG.md") && ok
+	var config Config
+	err := viper.UnmarshalKey("check", &config)
+	if err != nil {
+		logger.WithError(err).Errorf("Invalid configuration")
+		return false
+	}
+
+	for _, expectedDir := range config.Dirs {
+		ok = checkDirExists(logger, projectDir, expectedDir) && ok
+	}
+
+	for _, expectedFile := range config.Files {
+		switch expectedFile.Markup {
+		case "", markup:
+			switch expectedFile.Builder {
+			case "", builder.String(): // TODO: support negation filters
+				ok = checkFileExists(logger, projectDir, expectedFile.File) && ok
+			default:
+				// ignore the file
+			}
 		default:
-			ok = checkFileExists(logger, projectDir, "CHANGES.md") && ok
+			// ignore the file
 		}
 	}
-	ok = checkFileExists(logger, projectDir, "CREDITS."+markup) && ok
-	ok = checkFileExists(logger, projectDir, "Makefile") && ok
-	// TODO: README symlink?
-	ok = checkFileExists(logger, projectDir, "README."+markup) && ok
-	ok = checkFileExists(logger, projectDir, "TODO."+markup) && ok
-	ok = checkFileExists(logger, projectDir, "UNLICENSE") && ok
-	ok = checkFileExists(logger, projectDir, "VERSION") && ok
 
 	switch language {
 	case enum.C:
@@ -144,5 +158,10 @@ func checkProject(projectDir string) bool {
 	// TODO: check file checksums
 	// TODO: check change log
 
+	if ok {
+		logger.Infof("Checked project: OK")
+	} else {
+		logger.Warnf("Checked project: some issues")
+	}
 	return ok
 }

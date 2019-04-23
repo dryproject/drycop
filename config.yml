@@ -1,0 +1,32 @@
+output: text
+check:
+  dirs:
+    - .git
+  files:
+    # TODO: .travis.yml?
+    # TODO: README symlink?
+    - file: .gitignore
+    - file: AUTHORS
+    - file: CHANGES.rst
+      markup: rst
+    - file: CHANGELOG.md
+      markup: md
+      builder: Pub
+    - file: CHANGES.md
+      markup: md
+      builder: "!Pub"
+    - file: CREDITS.rst
+      markup: rst
+    - file: CREDITS.md
+      markup: md
+    - file: Makefile
+    - file: README.rst
+      markup: rst
+    - file: README.md
+      markup: md
+    - file: TODO.rst
+      markup: rst
+    - file: TODO.md
+      markup: md
+    - file: UNLICENSE
+    - file: VERSION
