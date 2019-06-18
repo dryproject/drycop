@@ -40,60 +40,60 @@ const (
 func (language Language) String() string {
 	switch language {
 	case C:
-		return "C"
+		return "c"
 	case Csharp:
-		return "C#"
+		return "csharp"
 	case Cxx:
-		return "C++"
+		return "cpp"
 	case CommonLisp:
-		return "Common Lisp"
+		return "lisp"
 	case D:
-		return "D"
+		return "d"
 	case Dart:
-		return "Dart"
+		return "dart"
 	case DRY:
-		return "DRY"
+		return "dry"
 	case Elixir:
-		return "Elixir"
+		return "elixir"
 	case Erlang:
-		return "Erlang"
+		return "erlang"
 	case Go:
-		return "Go"
+		return "go"
 	case Java:
-		return "Java"
+		return "java"
 	case JavaScript:
-		return "JavaScript"
+		return "javascript"
 	case Julia:
-		return "Julia"
+		return "julia"
 	case Kotlin:
-		return "Kotlin"
+		return "kotlin"
 	case Lua:
-		return "Lua"
+		return "lua"
 	case Markdown:
-		return "Markdown"
+		return "markdown"
 	case ObjectiveC:
-		return "Objective-C"
+		return "objectivec"
 	case OCaml:
-		return "OCaml"
+		return "ocaml"
 	case PHP:
-		return "PHP"
+		return "php"
 	case Python:
-		return "Python"
+		return "python"
 	case RestructuredText:
-		return "reStructuredText"
+		return "restructuredtext"
 	case Ruby:
-		return "Ruby"
+		return "ruby"
 	case Rust:
-		return "Rust"
+		return "rust"
 	case Swift:
-		return "Swift"
+		return "swift"
 	case TypeScript:
-		return "TypeScript"
+		return "typescript"
 	case YAML:
-		return "YAML"
+		return "yaml"
 	case Zig:
-		return "Zig"
+		return "zig"
 	case UnknownLanguage:
 	}
-	return "Unknown"
+	return "unknown"
 }

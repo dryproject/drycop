@@ -26,32 +26,32 @@ const (
 func (builder Builder) String() string {
 	switch builder {
 	case Autoconf:
-		return "Autoconf"
+		return "autoconf"
 	case Automake:
-		return "Automake"
+		return "automake"
 	case CMake:
-		return "CMake"
+		return "cmake"
 	case DartPub:
-		return "Pub"
+		return "pub"
 	case ElixirHex:
-		return "Hex"
+		return "hex"
 	case GoBuild:
-		return "Go"
+		return "go"
 	case Gradle:
-		return "Gradle"
+		return "gradle"
 	case Make:
-		return "Make"
+		return "make"
 	case Maven:
-		return "MVN"
+		return "mvn"
 	case OCamlDune:
-		return "Dune"
+		return "dune"
 	case PythonPIP:
-		return "PIP"
+		return "pip"
 	case RubyGems:
-		return "Gem"
+		return "gem"
 	case SwiftPackageManager:
-		return "SPM"
+		return "spm"
 	case UnknownBuilder:
 	}
-	return "Unknown"
+	return "unknown"
 }

@@ -16,12 +16,12 @@ const (
 func (framework Framework) String() string {
 	switch framework {
 	case Android:
-		return "Android"
+		return "android"
 	case Arduino:
-		return "Arduino"
+		return "arduino"
 	case Flutter:
-		return "Flutter"
+		return "flutter"
 	case UnknownFramework:
 	}
-	return "Unknown"
+	return "unknown"
 }
