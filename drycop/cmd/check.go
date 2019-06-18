@@ -3,10 +3,14 @@
 package cmd
 
 import (
+	"fmt"
 	"os"
+	"path/filepath"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/dryproject/drycop/drycop/enum"
+	"github.com/karrick/godirwalk"
+	"github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -79,12 +83,49 @@ func checkDirExists(logger *log.Entry, dir string, subdir string) bool {
 	return ok
 }
 
+func checkAgainstTemplate(logger *log.Entry, projectDir string, language enum.Language) bool {
+	ok := true
+
+	templatePath, err := homedir.Expand(fmt.Sprintf("~/.drycop/templates/%s", language.String()))
+	if err != nil {
+		logger.WithError(err).Errorf("Unable to find template directory")
+		return false
+	}
+
+	godirwalk.Walk(templatePath, &godirwalk.Options{
+		Callback: func(osPathname string, dirent *godirwalk.Dirent) error {
+			if osPathname == templatePath {
+				return nil
+			}
+			expectedPath := osPathname[len(templatePath)+1:]
+			if dirent.IsDir() {
+				if dirent.Name() == ".git" {
+					return filepath.SkipDir
+				}
+				ok = checkDirExists(logger, projectDir, expectedPath) && ok
+			} else {
+				ok = checkFileExists(logger, projectDir, expectedPath) && ok
+			}
+			//fmt.Printf("%s %s\n", dirent.ModeType(), expectedPath) // DEBUG
+			return nil
+		},
+		ErrorCallback: func(osPathname string, err error) godirwalk.ErrorAction {
+			return godirwalk.SkipNode
+		},
+	})
+
+	return ok
+}
+
 func checkProject(projectDir string) bool {
 	logger := log.WithField("project", projectDir)
 	logger.Info("Checking project")
 
 	builder := detectProjectBuilder(projectDir)
 	language := detectProjectLanguage(projectDir, builder)
+	if language == enum.UnknownLanguage {
+		language = enum.Go // FIXME
+	}
 	framework := detectProjectFramework(projectDir, builder, language)
 	markup := detectProjectMarkup(projectDir, language)
 	logger.WithFields(log.Fields{
@@ -102,6 +143,12 @@ func checkProject(projectDir string) bool {
 		logger.WithError(err).Errorf("Invalid configuration")
 		return false
 	}
+
+	if language != enum.UnknownLanguage {
+		ok = checkAgainstTemplate(logger, projectDir, language) && ok
+	}
+
+	// TODO: don't check dirs/files from template again, below.
 
 	for _, expectedDir := range config.Dirs {
 		ok = checkDirExists(logger, projectDir, expectedDir) && ok
