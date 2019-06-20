@@ -11,19 +11,25 @@ import (
 )
 
 type Project struct {
-	Logger    *log.Entry
-	Dir       string
-	Builder   enum.Builder
-	Framework enum.Framework
-	Language  enum.Language
-	Markup    string
+	Logger       *log.Entry
+	Dir          string
+	CheckedPaths map[string]bool
+	Builder      enum.Builder
+	Framework    enum.Framework
+	Language     enum.Language
+	Markup       string
 }
 
 func (project Project) CheckDirExists(dir string) bool {
+	if value, ok := project.CheckedPaths[dir]; ok {
+		return value
+	}
+
 	logger := project.Logger.WithField("dir", dir)
 	logger.Trace("Checking for directory")
 
 	ok := project.DirExists(dir)
+	project.CheckedPaths[dir] = ok
 	if !ok {
 		logger.Warnf("Missing directory: %s", dir)
 	}
@@ -31,10 +37,15 @@ func (project Project) CheckDirExists(dir string) bool {
 }
 
 func (project Project) CheckFileExists(file string) bool {
+	if value, ok := project.CheckedPaths[file]; ok {
+		return value
+	}
+
 	logger := project.Logger.WithField("file", file)
 	logger.Trace("Checking for file")
 
 	ok := project.FileExists(file)
+	project.CheckedPaths[file] = ok
 	if !ok {
 		logger.Warnf("Missing file: %s", file)
 	}
@@ -72,6 +83,7 @@ func (project Project) FilesExist(files string) bool {
 func DetectProject(projectDir string) Project {
 	var project Project
 	project.Dir = projectDir
+	project.CheckedPaths = make(map[string]bool)
 	project.Builder = DetectProjectBuilder(project)
 	project.Language = DetectProjectLanguage(project)
 	if project.Language == enum.UnknownLanguage {

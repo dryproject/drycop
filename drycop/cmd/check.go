@@ -122,8 +122,6 @@ func checkProject(projectDir string) bool {
 		ok = checkAgainstTemplate(project) && ok
 	}
 
-	// TODO: don't check dirs/files from template again, below.
-
 	for _, expectedDir := range config.Dirs {
 		ok = project.CheckDirExists(expectedDir) && ok
 	}
