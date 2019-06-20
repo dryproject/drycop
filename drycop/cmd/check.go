@@ -9,6 +9,7 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/dryproject/drycop/drycop/enum"
+	"github.com/dryproject/drycop/drycop/util"
 	"github.com/karrick/godirwalk"
 	"github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
@@ -61,29 +62,7 @@ func init() {
 	RootCmd.AddCommand(CheckCmd)
 }
 
-func checkFileExists(logger *log.Entry, dir string, file string) bool {
-	logger = logger.WithField("file", file)
-	logger.Trace("Checking for file")
-
-	ok := fileExists(dir, file)
-	if !ok {
-		logger.Warnf("Missing file: %s", file)
-	}
-	return ok
-}
-
-func checkDirExists(logger *log.Entry, dir string, subdir string) bool {
-	logger = logger.WithField("dir", subdir)
-	logger.Trace("Checking for directory")
-
-	ok := dirExists(dir, subdir)
-	if !ok {
-		logger.Warnf("Missing directory: %s", subdir)
-	}
-	return ok
-}
-
-func checkAgainstTemplate(project Project) bool {
+func checkAgainstTemplate(project util.Project) bool {
 	ok := true
 
 	templatePath, err := homedir.Expand(fmt.Sprintf("~/.drycop/templates/%s", project.Language.String()))
@@ -102,9 +81,9 @@ func checkAgainstTemplate(project Project) bool {
 				if dirent.Name() == ".git" {
 					return filepath.SkipDir
 				}
-				ok = checkDirExists(project.Logger, project.Dir, expectedPath) && ok
+				ok = project.CheckDirExists(expectedPath) && ok
 			} else {
-				ok = checkFileExists(project.Logger, project.Dir, expectedPath) && ok
+				ok = project.CheckFileExists(expectedPath) && ok
 			}
 			//fmt.Printf("%s %s\n", dirent.ModeType(), expectedPath) // DEBUG
 			return nil
@@ -121,7 +100,7 @@ func checkProject(projectDir string) bool {
 	logger := log.WithField("project", projectDir)
 	logger.Info("Checking project")
 
-	project := detectProject(projectDir)
+	project := util.DetectProject(projectDir)
 	project.Logger = logger
 	logger.WithFields(log.Fields{
 		"builder":   project.Builder,
@@ -146,7 +125,7 @@ func checkProject(projectDir string) bool {
 	// TODO: don't check dirs/files from template again, below.
 
 	for _, expectedDir := range config.Dirs {
-		ok = checkDirExists(logger, project.Dir, expectedDir) && ok
+		ok = project.CheckDirExists(expectedDir) && ok
 	}
 
 	for _, expectedFile := range config.Files {
@@ -154,7 +133,7 @@ func checkProject(projectDir string) bool {
 		case "", project.Markup:
 			switch expectedFile.Builder {
 			case "", project.Builder.String(): // TODO: support negation filters
-				ok = checkFileExists(logger, project.Dir, expectedFile.File) && ok
+				ok = project.CheckFileExists(expectedFile.File) && ok
 			default:
 				// ignore the file
 			}

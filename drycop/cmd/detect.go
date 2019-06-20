@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	log "github.com/Sirupsen/logrus"
+	"github.com/dryproject/drycop/drycop/util"
 	"github.com/spf13/cobra"
 )
 
@@ -44,7 +45,7 @@ func detectProjectAtPath(projectDir string) {
 	logger := log.WithField("project", projectDir)
 	logger.Info("Detecting project")
 
-	project := detectProject(projectDir)
+	project := util.DetectProject(projectDir)
 	project.Logger = logger
 	logger.WithFields(log.Fields{
 		"builder":   project.Builder,
