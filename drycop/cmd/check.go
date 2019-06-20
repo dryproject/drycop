@@ -83,12 +83,12 @@ func checkDirExists(logger *log.Entry, dir string, subdir string) bool {
 	return ok
 }
 
-func checkAgainstTemplate(logger *log.Entry, projectDir string, language enum.Language) bool {
+func checkAgainstTemplate(project Project) bool {
 	ok := true
 
-	templatePath, err := homedir.Expand(fmt.Sprintf("~/.drycop/templates/%s", language.String()))
+	templatePath, err := homedir.Expand(fmt.Sprintf("~/.drycop/templates/%s", project.Language.String()))
 	if err != nil {
-		logger.WithError(err).Errorf("Unable to find template directory")
+		project.Logger.WithError(err).Errorf("Unable to find template directory")
 		return false
 	}
 
@@ -102,9 +102,9 @@ func checkAgainstTemplate(logger *log.Entry, projectDir string, language enum.La
 				if dirent.Name() == ".git" {
 					return filepath.SkipDir
 				}
-				ok = checkDirExists(logger, projectDir, expectedPath) && ok
+				ok = checkDirExists(project.Logger, project.Dir, expectedPath) && ok
 			} else {
-				ok = checkFileExists(logger, projectDir, expectedPath) && ok
+				ok = checkFileExists(project.Logger, project.Dir, expectedPath) && ok
 			}
 			//fmt.Printf("%s %s\n", dirent.ModeType(), expectedPath) // DEBUG
 			return nil
@@ -121,18 +121,13 @@ func checkProject(projectDir string) bool {
 	logger := log.WithField("project", projectDir)
 	logger.Info("Checking project")
 
-	builder := detectProjectBuilder(projectDir)
-	language := detectProjectLanguage(projectDir, builder)
-	if language == enum.UnknownLanguage {
-		language = enum.Go // FIXME
-	}
-	framework := detectProjectFramework(projectDir, builder, language)
-	markup := detectProjectMarkup(projectDir, language)
+	project := detectProject(projectDir)
+	project.Logger = logger
 	logger.WithFields(log.Fields{
-		"builder":   builder,
-		"language":  language,
-		"framework": framework,
-		"markup":    markup,
+		"builder":   project.Builder,
+		"language":  project.Language,
+		"framework": project.Framework,
+		"markup":    project.Markup,
 	}).Info("Detected project")
 
 	ok := true
@@ -144,22 +139,22 @@ func checkProject(projectDir string) bool {
 		return false
 	}
 
-	if language != enum.UnknownLanguage {
-		ok = checkAgainstTemplate(logger, projectDir, language) && ok
+	if project.Language != enum.UnknownLanguage {
+		ok = checkAgainstTemplate(project) && ok
 	}
 
 	// TODO: don't check dirs/files from template again, below.
 
 	for _, expectedDir := range config.Dirs {
-		ok = checkDirExists(logger, projectDir, expectedDir) && ok
+		ok = checkDirExists(logger, project.Dir, expectedDir) && ok
 	}
 
 	for _, expectedFile := range config.Files {
 		switch expectedFile.Markup {
-		case "", markup:
+		case "", project.Markup:
 			switch expectedFile.Builder {
-			case "", builder.String(): // TODO: support negation filters
-				ok = checkFileExists(logger, projectDir, expectedFile.File) && ok
+			case "", project.Builder.String(): // TODO: support negation filters
+				ok = checkFileExists(logger, project.Dir, expectedFile.File) && ok
 			default:
 				// ignore the file
 			}
@@ -168,7 +163,7 @@ func checkProject(projectDir string) bool {
 		}
 	}
 
-	switch language {
+	switch project.Language {
 	case enum.C:
 	case enum.Csharp:
 	case enum.Cxx:

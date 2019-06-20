@@ -6,8 +6,18 @@ import (
 	"fmt"
 	"os"
 
+	log "github.com/Sirupsen/logrus"
 	"github.com/dryproject/drycop/drycop/enum"
 )
+
+type Project struct {
+	Logger    *log.Entry
+	Dir       string
+	Builder   enum.Builder
+	Framework enum.Framework
+	Language  enum.Language
+	Markup    string
+}
 
 func validateInputDirectory(arg string) (int, error) {
 	info, err := os.Stat(arg)
@@ -49,56 +59,69 @@ func filesExist(dir string, files string) bool {
 	return false // TODO
 }
 
-func detectProjectBuilder(projectDir string) enum.Builder {
+func detectProject(projectDir string) Project {
+	var project Project
+	project.Dir = projectDir
+	project.Builder = detectProjectBuilder(project)
+	project.Language = detectProjectLanguage(project)
+	if project.Language == enum.UnknownLanguage {
+		project.Language = enum.Go // FIXME
+	}
+	project.Framework = detectProjectFramework(project)
+	project.Markup = detectProjectMarkup(project)
+	return project
+}
+
+func detectProjectBuilder(project Project) enum.Builder {
 	// TODO: this should be a YAML configuration file.
-	if fileExists(projectDir, "configure.ac") {
+	if fileExists(project.Dir, "configure.ac") {
 		return enum.Autoconf
 	}
-	if fileExists(projectDir, "Makefile.am") { // must follow the Autoconf check
+	if fileExists(project.Dir, "Makefile.am") { // must follow the Autoconf check
 		return enum.Automake
 	}
-	if fileExists(projectDir, "CMakeLists.txt") {
+	if fileExists(project.Dir, "CMakeLists.txt") {
 		return enum.CMake
 	}
-	if fileExists(projectDir, "pubspec.yaml") {
+	if fileExists(project.Dir, "pubspec.yaml") {
 		return enum.DartPub
 	}
-	if fileExists(projectDir, "mix.exs") {
+	if fileExists(project.Dir, "mix.exs") {
 		return enum.ElixirHex
 	}
-	if fileExists(projectDir, "go.mod") { // TODO: improve this
+	if fileExists(project.Dir, "go.mod") { // TODO: improve this
 		return enum.GoBuild
 	}
-	if fileExists(projectDir, "build.gradle") {
+	if fileExists(project.Dir, "build.gradle") {
 		return enum.Gradle
 	}
-	if fileExists(projectDir, "pom.xml") {
+	if fileExists(project.Dir, "pom.xml") {
 		return enum.Maven
 	}
-	if fileExists(projectDir, "dune") {
+	if fileExists(project.Dir, "dune") {
 		return enum.OCamlDune
 	}
-	if fileExists(projectDir, "setup.py") {
+	if fileExists(project.Dir, "setup.py") {
 		return enum.PythonPIP
 	}
-	if fileExists(projectDir, "Gemfile") || filesExist(projectDir, "*.gemspec") {
+	if fileExists(project.Dir, "Gemfile") || filesExist(project.Dir, "*.gemspec") {
 		return enum.RubyGems
 	}
-	if fileExists(projectDir, "Package.swift") {
+	if fileExists(project.Dir, "Package.swift") {
 		return enum.SwiftPackageManager
 	}
-	if filesExist(projectDir, "*.go") { // must remain at the end
+	if filesExist(project.Dir, "*.go") { // must remain at the end
 		return enum.GoBuild
 	}
-	if fileExists(projectDir, "Makefile") { // must remain the last check
+	if fileExists(project.Dir, "Makefile") { // must remain the last check
 		return enum.Make
 	}
 	return enum.UnknownBuilder
 }
 
-func detectProjectLanguage(projectDir string, builder enum.Builder) enum.Language {
+func detectProjectLanguage(project Project) enum.Language {
 	// TODO: this should be a YAML configuration file.
-	switch builder {
+	switch project.Builder {
 	case enum.Autoconf:
 		return enum.Cxx // TODO: also C, etc
 	case enum.Automake:
@@ -129,22 +152,22 @@ func detectProjectLanguage(projectDir string, builder enum.Builder) enum.Languag
 	return enum.UnknownLanguage
 }
 
-func detectProjectFramework(projectDir string, builder enum.Builder, language enum.Language) enum.Framework {
+func detectProjectFramework(project Project) enum.Framework {
 	// TODO: this should be a YAML configuration file.
-	if fileExists(projectDir, "library.properties") {
+	if fileExists(project.Dir, "library.properties") {
 		return enum.Arduino
 	}
-	if language == enum.Dart && (fileExists(projectDir, ".flutter-plugins") || dirExists(projectDir, "android")) {
+	if project.Language == enum.Dart && (fileExists(project.Dir, ".flutter-plugins") || dirExists(project.Dir, "android")) {
 		return enum.Flutter
 	}
-	if language == enum.Java && fileExists(projectDir, "app/build.gradle") {
+	if project.Language == enum.Java && fileExists(project.Dir, "app/build.gradle") {
 		return enum.Android
 	}
 	return enum.UnknownFramework
 }
 
-func detectProjectMarkup(projectDir string, language enum.Language) string {
-	switch language {
+func detectProjectMarkup(project Project) string {
+	switch project.Language {
 	case enum.C:
 	case enum.Csharp:
 	case enum.Cxx:

@@ -31,7 +31,7 @@ var DetectCmd = &cobra.Command{
 
 		// Process the input arguments:
 		for _, arg := range args {
-			detectProject(arg)
+			detectProjectAtPath(arg)
 		}
 	},
 }
@@ -40,17 +40,22 @@ func init() {
 	RootCmd.AddCommand(DetectCmd)
 }
 
-func detectProject(projectDir string) {
+func detectProjectAtPath(projectDir string) {
 	logger := log.WithField("project", projectDir)
 	logger.Info("Detecting project")
 
-	builder := detectProjectBuilder(projectDir)
-	language := detectProjectLanguage(projectDir, builder)
-	framework := detectProjectFramework(projectDir, builder, language)
+	project := detectProject(projectDir)
+	project.Logger = logger
+	logger.WithFields(log.Fields{
+		"builder":   project.Builder,
+		"language":  project.Language,
+		"framework": project.Framework,
+		"markup":    project.Markup,
+	}).Info("Detected project")
 
 	fmt.Printf("%s\tlanguage=%s\tbuilder=%s\tframework=%s\n",
 		projectDir,
-		strings.ToLower(language.String()),
-		strings.ToLower(builder.String()),
-		strings.ToLower(framework.String()))
+		strings.ToLower(project.Language.String()),
+		strings.ToLower(project.Builder.String()),
+		strings.ToLower(project.Framework.String()))
 }
