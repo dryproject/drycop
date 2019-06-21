@@ -65,5 +65,6 @@ Usage on Travis CI
    install:
      - go get -u github.com/dryproject/drycop/drycop
    script:
-     - drycop init
+     - drycop init -v
      - drycop check -v
+     - drycop test -v
