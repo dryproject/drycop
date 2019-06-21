@@ -55,6 +55,7 @@ Usage on Travis CI
 ::
 
    $ cat .travis.yml
+
    # See: https://drycop.org
    language: go
    go:
@@ -64,4 +65,5 @@ Usage on Travis CI
    install:
      - go get -u github.com/dryproject/drycop/drycop
    script:
+     - drycop init
      - drycop check -v
