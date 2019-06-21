@@ -13,19 +13,7 @@ import (
 	"github.com/karrick/godirwalk"
 	"github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
-
-type File struct {
-	File    string `mapstructure:"file"`
-	Markup  string `mapstructure:"markup"`
-	Builder string `mapstructure:"builder"`
-}
-
-type Config struct {
-	Dirs  []string `mapstructure:"dirs"`
-	Files []File   `mapstructure:"files"`
-}
 
 // CheckCmd describes and implements the `drycop check` command
 var CheckCmd = &cobra.Command{
@@ -119,8 +107,7 @@ func checkProject(projectDir string) bool {
 
 	ok := true
 
-	var config Config
-	err := viper.UnmarshalKey("check", &config)
+	config, err := util.LoadCheckConfig()
 	if err != nil {
 		logger.WithError(err).Errorf("Invalid configuration")
 		return false
