@@ -10,6 +10,7 @@ type Framework int
 // The list of supported development frameworks
 const (
 	UnknownFramework Framework = iota
+	NoFramework
 	Android
 	Arduino
 	Flutter
@@ -21,6 +22,8 @@ func (framework *Framework) Type() string {
 
 func (framework *Framework) String() string {
 	switch *framework {
+	case NoFramework:
+		return "none"
 	case Android:
 		return "android"
 	case Arduino:
@@ -34,6 +37,8 @@ func (framework *Framework) String() string {
 
 func (framework *Framework) Set(input string) error {
 	switch input {
+	case "none":
+		*framework = NoFramework
 	case "android":
 		*framework = Android
 	case "arduino":

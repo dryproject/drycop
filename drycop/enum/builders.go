@@ -10,6 +10,7 @@ type Builder int
 // The list of supported build systems
 const (
 	UnknownBuilder Builder = iota
+	NoBuilder
 	Autoconf
 	Automake
 	CMake
@@ -31,6 +32,8 @@ func (builder *Builder) Type() string {
 
 func (builder *Builder) String() string {
 	switch *builder {
+	case NoBuilder:
+		return "none"
 	case Autoconf:
 		return "autoconf"
 	case Automake:
@@ -64,6 +67,8 @@ func (builder *Builder) String() string {
 
 func (builder *Builder) Set(input string) error {
 	switch input {
+	case "none":
+		*builder = NoBuilder
 	case "autoconf":
 		*builder = Autoconf
 	case "automake":
