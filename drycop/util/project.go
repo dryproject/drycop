@@ -80,7 +80,7 @@ func (project Project) FilesExist(files string) bool {
 	return false // TODO
 }
 
-func (project Project) Detect() error {
+func (project *Project) Detect() error {
 	if project.Builder == enum.UnknownBuilder {
 		project.Builder = project.DetectBuilder()
 	}
