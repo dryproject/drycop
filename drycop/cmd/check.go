@@ -66,11 +66,14 @@ func checkAgainstTemplate(project util.Project) bool {
 			}
 			expectedPath := osPathname[len(templatePath)+1:]
 			if dirent.IsDir() {
-				if dirent.Name() == ".git" {
-					return filepath.SkipDir
+				if dirent.Name() == ".git" || expectedPath == ignoredPath {
+					return filepath.SkipDir // skip the whole subdirectory
 				}
 				ok = project.CheckDirExists(expectedPath) && ok
 			} else {
+				if expectedPath == ignoredPath {
+					return nil // skip the file
+				}
 				ok = project.CheckFileExists(expectedPath) && ok
 			}
 			//fmt.Printf("%s %s\n", dirent.ModeType(), expectedPath) // DEBUG

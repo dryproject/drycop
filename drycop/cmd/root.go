@@ -19,6 +19,7 @@ var builderOverride enum.Builder
 var languageOverride enum.Language
 var frameworkOverride enum.Framework
 var markupOverride string
+var ignoredPath string
 var debug bool
 var verbose bool
 
@@ -47,6 +48,7 @@ func init() {
 	RootCmd.PersistentFlags().VarP(&languageOverride, "language", "L", "Set project language")
 	RootCmd.PersistentFlags().VarP(&frameworkOverride, "framework", "F", "Set project framework")
 	RootCmd.PersistentFlags().StringVarP(&markupOverride, "markup", "M", "", "Set project markup format")
+	RootCmd.PersistentFlags().StringVarP(&ignoredPath, "ignore", "I", "", "Skip a file or directory")
 	RootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Be verbose")
 	RootCmd.SetVersionTemplate(`DRYcop {{printf "%s" .Version}}
 `)
