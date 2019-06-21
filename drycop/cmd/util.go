@@ -20,3 +20,14 @@ func validateInputDirectory(arg string) (int, error) {
 	}
 	return 0, nil
 }
+
+func checkPathExists(path string) (bool, error) {
+	_, err := os.Stat(path)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return false, nil
+		}
+		return false, err
+	}
+	return true, nil
+}

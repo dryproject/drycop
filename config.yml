@@ -1,4 +1,5 @@
 output: text
+
 check:
   dirs:
     - .git
@@ -30,3 +31,19 @@ check:
       markup: md
     - file: UNLICENSE
     - file: VERSION
+
+templates:
+  c: https://github.com/dryc/c-template
+  cpp: https://github.com/drycpp/cpp-template
+  dart: https://github.com/drydart/dart-template
+  elixir: https://github.com/dryex/elixir-template
+  go: https://github.com/drygopher/go-template
+  lisp: https://github.com/drylisp/lisp-template
+  lua: https://github.com/drylua/lua-template
+  ocaml: https://github.com/drycaml/ocaml-template
+  php: https://github.com/dryphp/php-template
+  python: https://github.com/drypy/python-template
+  ruby: https://github.com/dryruby/ruby-template
+  rust: https://github.com/dryrust/rust-template
+  swift: https://github.com/dryswift/swift-template
+  zig: https://github.com/dryzig/zig-template
