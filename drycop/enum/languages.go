@@ -2,6 +2,8 @@
 
 package enum
 
+import "fmt"
+
 // Language is an enumeration type for programming languages
 type Language int
 
@@ -10,7 +12,7 @@ const (
 	UnknownLanguage Language = iota
 	C
 	Csharp
-	Cxx
+	Cpp
 	CommonLisp
 	D
 	Dart
@@ -37,13 +39,17 @@ const (
 	Zig
 )
 
-func (language Language) String() string {
-	switch language {
+func (language *Language) Type() string {
+	return "language"
+}
+
+func (language *Language) String() string {
+	switch *language {
 	case C:
 		return "c"
 	case Csharp:
 		return "csharp"
-	case Cxx:
+	case Cpp:
 		return "cpp"
 	case CommonLisp:
 		return "lisp"
@@ -96,4 +102,67 @@ func (language Language) String() string {
 	case UnknownLanguage:
 	}
 	return "unknown"
+}
+
+func (language *Language) Set(input string) error {
+	switch input {
+	case "c":
+		*language = C
+	case "csharp":
+		*language = Csharp
+	case "cpp":
+		*language = Cpp
+	case "lisp":
+		*language = CommonLisp
+	case "d":
+		*language = D
+	case "dart":
+		*language = Dart
+	case "dry":
+		*language = DRY
+	case "elixir":
+		*language = Elixir
+	case "erlang":
+		*language = Erlang
+	case "go":
+		*language = Go
+	case "java":
+		*language = Java
+	case "javascript":
+		*language = JavaScript
+	case "julia":
+		*language = Julia
+	case "kotlin":
+		*language = Kotlin
+	case "lua":
+		*language = Lua
+	case "markdown":
+		*language = Markdown
+	case "objectivec":
+		*language = ObjectiveC
+	case "ocaml":
+		*language = OCaml
+	case "php":
+		*language = PHP
+	case "python":
+		*language = Python
+	case "restructuredtext":
+		*language = RestructuredText
+	case "ruby":
+		*language = Ruby
+	case "rust":
+		*language = Rust
+	case "swift":
+		*language = Swift
+	case "typescript":
+		*language = TypeScript
+	case "yaml":
+		*language = YAML
+	case "zig":
+		*language = Zig
+	default:
+		*language = UnknownLanguage
+		return fmt.Errorf("unknown language: %s", input)
+	}
+	return nil
 }

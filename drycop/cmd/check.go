@@ -98,14 +98,22 @@ func checkAgainstTemplate(project util.Project) bool {
 
 func checkProject(projectDir string) bool {
 	logger := log.WithField("project", projectDir)
-	logger.Info("Checking project")
+	project := util.Project{
+		Logger:       logger,
+		Dir:          projectDir,
+		CheckedPaths: make(map[string]bool),
+		Builder:      builderOverride,
+		Language:     languageOverride,
+		Framework:    frameworkOverride,
+		Markup:       markupOverride,
+	}
 
-	project := util.DetectProject(projectDir)
-	project.Logger = logger
+	logger.Info("Checking project")
+	project.Detect()
 	logger.WithFields(log.Fields{
-		"builder":   project.Builder,
-		"language":  project.Language,
-		"framework": project.Framework,
+		"builder":   project.Builder.String(),
+		"language":  project.Language.String(),
+		"framework": project.Framework.String(),
 		"markup":    project.Markup,
 	}).Info("Detected project")
 
@@ -143,7 +151,7 @@ func checkProject(projectDir string) bool {
 	switch project.Language {
 	case enum.C:
 	case enum.Csharp:
-	case enum.Cxx:
+	case enum.Cpp:
 	case enum.CommonLisp:
 	case enum.D:
 	case enum.Dart:

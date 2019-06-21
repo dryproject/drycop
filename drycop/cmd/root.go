@@ -8,12 +8,17 @@ import (
 	"os"
 
 	log "github.com/Sirupsen/logrus"
+	"github.com/dryproject/drycop/drycop/enum"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
 var configFile string
 var outputFormat string
+var builderOverride enum.Builder
+var languageOverride enum.Language
+var frameworkOverride enum.Framework
+var markupOverride string
 var debug bool
 var verbose bool
 
@@ -38,6 +43,10 @@ func init() {
 	RootCmd.PersistentFlags().StringVarP(&configFile, "config", "C", "", "Set config file (default: $HOME/.drycop/config.yaml)")
 	RootCmd.PersistentFlags().BoolVarP(&debug, "debug", "d", false, "Enable debugging")
 	RootCmd.PersistentFlags().StringVarP(&outputFormat, "output", "o", "", "Set output format to 'text' or 'json' (default: text)")
+	RootCmd.PersistentFlags().VarP(&builderOverride, "builder", "B", "Set project builder")
+	RootCmd.PersistentFlags().VarP(&languageOverride, "language", "L", "Set project language")
+	RootCmd.PersistentFlags().VarP(&frameworkOverride, "framework", "F", "Set project framework")
+	RootCmd.PersistentFlags().StringVarP(&markupOverride, "markup", "M", "", "Set project markup format")
 	RootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Be verbose")
 	RootCmd.SetVersionTemplate(`DRYcop {{printf "%s" .Version}}
 `)

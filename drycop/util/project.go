@@ -15,8 +15,8 @@ type Project struct {
 	Dir          string
 	CheckedPaths map[string]bool
 	Builder      enum.Builder
-	Framework    enum.Framework
 	Language     enum.Language
+	Framework    enum.Framework
 	Markup       string
 }
 
@@ -80,21 +80,26 @@ func (project Project) FilesExist(files string) bool {
 	return false // TODO
 }
 
-func DetectProject(projectDir string) Project {
-	var project Project
-	project.Dir = projectDir
-	project.CheckedPaths = make(map[string]bool)
-	project.Builder = DetectProjectBuilder(project)
-	project.Language = DetectProjectLanguage(project)
-	if project.Language == enum.UnknownLanguage {
-		project.Language = enum.Go // FIXME
+func (project Project) Detect() error {
+	if project.Builder == enum.UnknownBuilder {
+		project.Builder = project.DetectBuilder()
 	}
-	project.Framework = DetectProjectFramework(project)
-	project.Markup = DetectProjectMarkup(project)
-	return project
+	if project.Language == enum.UnknownLanguage {
+		project.Language = project.DetectLanguage()
+		if project.Language == enum.UnknownLanguage {
+			project.Language = enum.Go // FIXME
+		}
+	}
+	if project.Framework == enum.UnknownFramework {
+		project.Framework = project.DetectFramework()
+	}
+	if project.Markup == "" {
+		project.Markup = project.DetectMarkup()
+	}
+	return nil
 }
 
-func DetectProjectBuilder(project Project) enum.Builder {
+func (project Project) DetectBuilder() enum.Builder {
 	// TODO: this should be a YAML configuration file.
 	if project.FileExists("configure.ac") {
 		return enum.Autoconf
@@ -141,15 +146,15 @@ func DetectProjectBuilder(project Project) enum.Builder {
 	return enum.UnknownBuilder
 }
 
-func DetectProjectLanguage(project Project) enum.Language {
+func (project Project) DetectLanguage() enum.Language {
 	// TODO: this should be a YAML configuration file.
 	switch project.Builder {
 	case enum.Autoconf:
-		return enum.Cxx // TODO: also C, etc
+		return enum.Cpp // TODO: also C, etc
 	case enum.Automake:
-		return enum.Cxx // TODO: also C, etc
+		return enum.Cpp // TODO: also C, etc
 	case enum.CMake:
-		return enum.Cxx // TODO: also C, etc
+		return enum.Cpp // TODO: also C, etc
 	case enum.DartPub:
 		return enum.Dart
 	case enum.ElixirHex:
@@ -174,7 +179,7 @@ func DetectProjectLanguage(project Project) enum.Language {
 	return enum.UnknownLanguage
 }
 
-func DetectProjectFramework(project Project) enum.Framework {
+func (project Project) DetectFramework() enum.Framework {
 	// TODO: this should be a YAML configuration file.
 	if project.FileExists("library.properties") {
 		return enum.Arduino
@@ -188,11 +193,11 @@ func DetectProjectFramework(project Project) enum.Framework {
 	return enum.UnknownFramework
 }
 
-func DetectProjectMarkup(project Project) string {
+func (project Project) DetectMarkup() string {
 	switch project.Language {
 	case enum.C:
 	case enum.Csharp:
-	case enum.Cxx:
+	case enum.Cpp:
 	case enum.CommonLisp:
 	case enum.D:
 	case enum.Dart:

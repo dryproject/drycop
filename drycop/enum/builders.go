@@ -2,6 +2,8 @@
 
 package enum
 
+import "fmt"
+
 // Builder is an enumeration type for build systems
 type Builder int
 
@@ -23,8 +25,12 @@ const (
 	SwiftPackageManager
 )
 
-func (builder Builder) String() string {
-	switch builder {
+func (builder *Builder) Type() string {
+	return "builder"
+}
+
+func (builder *Builder) String() string {
+	switch *builder {
 	case Autoconf:
 		return "autoconf"
 	case Automake:
@@ -54,4 +60,39 @@ func (builder Builder) String() string {
 	case UnknownBuilder:
 	}
 	return "unknown"
+}
+
+func (builder *Builder) Set(input string) error {
+	switch input {
+	case "autoconf":
+		*builder = Autoconf
+	case "automake":
+		*builder = Automake
+	case "cmake":
+		*builder = CMake
+	case "pub":
+		*builder = DartPub
+	case "hex":
+		*builder = ElixirHex
+	case "go":
+		*builder = GoBuild
+	case "gradle":
+		*builder = Gradle
+	case "make":
+		*builder = Make
+	case "mvn":
+		*builder = Maven
+	case "dune":
+		*builder = OCamlDune
+	case "pip":
+		*builder = PythonPIP
+	case "gem":
+		*builder = RubyGems
+	case "spm":
+		*builder = SwiftPackageManager
+	default:
+		*builder = UnknownBuilder
+		return fmt.Errorf("unknown builder: %s", input)
+	}
+	return nil
 }

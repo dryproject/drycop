@@ -2,6 +2,8 @@
 
 package enum
 
+import "fmt"
+
 // Framework is an enumeration type for development frameworks
 type Framework int
 
@@ -13,8 +15,12 @@ const (
 	Flutter
 )
 
-func (framework Framework) String() string {
-	switch framework {
+func (framework *Framework) Type() string {
+	return "framework"
+}
+
+func (framework *Framework) String() string {
+	switch *framework {
 	case Android:
 		return "android"
 	case Arduino:
@@ -24,4 +30,19 @@ func (framework Framework) String() string {
 	case UnknownFramework:
 	}
 	return "unknown"
+}
+
+func (framework *Framework) Set(input string) error {
+	switch input {
+	case "android":
+		*framework = Android
+	case "arduino":
+		*framework = Arduino
+	case "flutter":
+		*framework = Flutter
+	default:
+		*framework = UnknownFramework
+		return fmt.Errorf("unknown framework: %s", input)
+	}
+	return nil
 }
