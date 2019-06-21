@@ -101,3 +101,37 @@ func (builder *Builder) Set(input string) error {
 	}
 	return nil
 }
+
+func (builder *Builder) TestCommand() string {
+	switch *builder {
+	case NoBuilder:
+	case Autoconf:
+		return "make check"
+	case Automake:
+		return "make check"
+	case CMake:
+		return "make check"
+	case DartPub:
+		return "pub run test"
+	case ElixirHex:
+		return "mix test"
+	case GoBuild:
+		return "go test -v ./..."
+	case Gradle:
+		return "gradle test"
+	case Make:
+		return "make check"
+	case Maven:
+		return "mvn test"
+	case OCamlDune:
+		return "dune runtest"
+	case PythonPIP:
+		return "pytest"
+	case RubyGems:
+		return "rake test"
+	case SwiftPackageManager:
+		return "swift test"
+	case UnknownBuilder:
+	}
+	return ""
+}

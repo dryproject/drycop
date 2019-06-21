@@ -42,20 +42,15 @@ func init() {
 }
 
 func detectProjectAtPath(projectDir string) {
-	logger := log.WithField("project", projectDir)
-	project := util.Project{
-		Logger:       logger,
-		Dir:          projectDir,
-		CheckedPaths: make(map[string]bool),
-		Builder:      builderOverride,
-		Language:     languageOverride,
-		Framework:    frameworkOverride,
-		Markup:       markupOverride,
-	}
+	project := util.NewProject(projectDir, log.WithFields(log.Fields{}))
+	project.Builder = builderOverride
+	project.Language = languageOverride
+	project.Framework = frameworkOverride
+	project.Markup = markupOverride
 
-	logger.Info("Detecting project")
+	project.Logger.Info("Detecting project")
 	project.Detect()
-	logger.WithFields(log.Fields{
+	project.Logger.WithFields(log.Fields{
 		"builder":   project.Builder.String(),
 		"language":  project.Language.String(),
 		"framework": project.Framework.String(),

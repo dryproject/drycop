@@ -85,20 +85,15 @@ func checkAgainstTemplate(project util.Project) bool {
 }
 
 func checkProject(projectDir string) bool {
-	logger := log.WithField("project", projectDir)
-	project := util.Project{
-		Logger:       logger,
-		Dir:          projectDir,
-		CheckedPaths: make(map[string]bool),
-		Builder:      builderOverride,
-		Language:     languageOverride,
-		Framework:    frameworkOverride,
-		Markup:       markupOverride,
-	}
+	project := util.NewProject(projectDir, log.WithFields(log.Fields{}))
+	project.Builder = builderOverride
+	project.Language = languageOverride
+	project.Framework = frameworkOverride
+	project.Markup = markupOverride
 
-	logger.Info("Checking project")
+	project.Logger.Info("Checking project")
 	project.Detect()
-	logger.WithFields(log.Fields{
+	project.Logger.WithFields(log.Fields{
 		"builder":   project.Builder.String(),
 		"language":  project.Language.String(),
 		"framework": project.Framework.String(),
@@ -109,12 +104,12 @@ func checkProject(projectDir string) bool {
 
 	config, err := util.LoadCheckConfig()
 	if err != nil {
-		logger.WithError(err).Errorf("Invalid configuration")
+		project.Logger.WithError(err).Errorf("Invalid configuration")
 		return false
 	}
 
 	if project.Language != enum.UnknownLanguage {
-		ok = checkAgainstTemplate(project) && ok
+		ok = checkAgainstTemplate(*project) && ok
 	}
 
 	for _, expectedDir := range config.Dirs {
@@ -173,9 +168,9 @@ func checkProject(projectDir string) bool {
 	// TODO: check change log
 
 	if ok {
-		logger.Infof("Checked project: OK")
+		project.Logger.Infof("Checked project: OK")
 	} else {
-		logger.Warnf("Checked project: some issues")
+		project.Logger.Warnf("Checked project: some issues")
 	}
 	return ok
 }

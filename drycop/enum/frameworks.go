@@ -51,3 +51,17 @@ func (framework *Framework) Set(input string) error {
 	}
 	return nil
 }
+
+func (framework *Framework) TestCommand() string {
+	switch *framework {
+	case NoFramework:
+	case Android:
+		// TODO
+	case Arduino:
+		// TODO
+	case Flutter:
+		return "flutter test"
+	case UnknownFramework:
+	}
+	return ""
+}

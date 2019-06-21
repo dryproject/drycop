@@ -166,3 +166,7 @@ func (language *Language) Set(input string) error {
 	}
 	return nil
 }
+
+func (language *Language) TestCommand() string {
+	return "" // TODO
+}

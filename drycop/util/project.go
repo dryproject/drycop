@@ -20,6 +20,19 @@ type Project struct {
 	Markup       string
 }
 
+func NewProject(projectDir string, logger *log.Entry) *Project {
+	project := Project{
+		Logger:       logger.WithField("project", projectDir),
+		Dir:          projectDir,
+		CheckedPaths: make(map[string]bool),
+		Builder:      enum.UnknownBuilder,
+		Language:     enum.UnknownLanguage,
+		Framework:    enum.UnknownFramework,
+		Markup:       "",
+	}
+	return &project
+}
+
 func (project Project) CheckDirExists(dir string) bool {
 	if value, ok := project.CheckedPaths[dir]; ok {
 		return value
