@@ -13,5 +13,5 @@ install:
   - go get -t -v ./...
 script:
   - drycop init -d -L go
-  - drycop check -d -B go -L go -F none
+  - drycop check -d -B go -L go -F none -I .github
   - drycop test -d -B go
